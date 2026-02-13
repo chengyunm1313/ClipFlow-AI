@@ -63,7 +63,11 @@ export default function HomePage() {
 			if (!file) return;
 			try {
 				await uploadVideo(projectId, file);
-				await analyzeProject(projectId);
+				try {
+					await analyzeProject(projectId);
+				} catch {
+					// 409 等非嚴重錯誤：分析可能已在進行中，忽略即可
+				}
 				await refresh();
 			} catch (e: unknown) {
 				setError(e instanceof Error ? e.message : '上傳失敗');
@@ -179,7 +183,11 @@ export default function HomePage() {
 									<button
 										className='btn btn-success btn-sm'
 										onClick={async () => {
-											await analyzeProject(p.id);
+											try {
+												await analyzeProject(p.id);
+											} catch {
+												// 409：已在分析中，忽略
+											}
 											await refresh();
 										}}
 									>

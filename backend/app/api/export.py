@@ -5,8 +5,16 @@ EDL / XML / SRT / 合併影片 匯出
 
 from __future__ import annotations
 
+from urllib.parse import quote
+
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse, FileResponse
+
+
+def _safe_disposition(filename: str) -> str:
+    """產生同時支援 ASCII 回退和 UTF-8 的 Content-Disposition 值"""
+    encoded = quote(filename)
+    return f"attachment; filename=\"export\"; filename*=UTF-8''{encoded}"
 
 from app.core.audio import concat_segments_to_video
 from app.core.exporter import export_edl, export_xml, export_srt
@@ -52,9 +60,7 @@ async def export_edl_file(project_id: str):
     return PlainTextResponse(
         content=content,
         media_type="text/plain",
-        headers={
-            "Content-Disposition": f'attachment; filename="{project.name}.edl"'
-        },
+        headers={"Content-Disposition": _safe_disposition(f"{project.name}.edl")},
     )
 
 
@@ -75,9 +81,7 @@ async def export_xml_file(project_id: str):
     return PlainTextResponse(
         content=content,
         media_type="application/xml",
-        headers={
-            "Content-Disposition": f'attachment; filename="{project.name}.xml"'
-        },
+        headers={"Content-Disposition": _safe_disposition(f"{project.name}.xml")},
     )
 
 
@@ -106,9 +110,7 @@ async def export_srt_file(project_id: str):
     return PlainTextResponse(
         content=content,
         media_type="text/plain",
-        headers={
-            "Content-Disposition": f'attachment; filename="{project.name}.srt"'
-        },
+        headers={"Content-Disposition": _safe_disposition(f"{project.name}.srt")},
     )
 
 
@@ -136,6 +138,6 @@ async def export_video_file(project_id: str):
 
     return FileResponse(
         path=str(output),
-        filename=f"{project.name}_export.mp4",
         media_type="video/mp4",
+        headers={"Content-Disposition": _safe_disposition(f"{project.name}_export.mp4")},
     )
