@@ -1,0 +1,27 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Node.js
+node_modules/
+.next/
+
+# 本地資料
+data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# 環境變數
+.env
+.env.local
+
+# uv
+uv.lock
